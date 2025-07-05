@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Markdown Parser</string>
-    <string name="edit_markdown">Edit Markdown</string>
+    <string name="edit_markdown">Редактировать файл</string>
+    <string name="load_markdown">Выбрать файл</string>
+    <string name="save">Сохранить</string>
+    <string name="enter_url">Введите URL markdown файла</string>
+    <string name="fetch_from_url">Загрузить по ссылке</string>
+    <string name="load_from_device">Загрузить с устройства</string>
 </resources>

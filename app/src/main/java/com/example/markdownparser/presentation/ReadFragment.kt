@@ -11,25 +11,16 @@ import com.example.markdownparser.parser.MarkdownParser
 import com.example.markdownparser.renderer.MarkdownRenderer
 
 class ReadFragment : Fragment() {
-    private var _binding: FragmentReadBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentReadBinding
     private val viewModel: MarkdownViewModel by activityViewModels()
     private lateinit var markdownRenderer: MarkdownRenderer
-
-    companion object {
-        private const val ARG_CONTENT = "content"
-
-        fun newInstance(content: String) = ReadFragment().apply {
-            arguments = Bundle().apply { putString(ARG_CONTENT, content) }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentReadBinding.inflate(inflater, container, false)
+        binding = FragmentReadBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -45,6 +36,15 @@ class ReadFragment : Fragment() {
         binding.editMarkdown.setOnClickListener {
             viewModel.enterEditMode()
         }
+
+        binding.loadMarkdown.setOnClickListener {
+            viewModel.enterLoadMode()
+        }
+    }
+
+    override fun onDestroyView() {
+        binding.root.removeAllViews()
+        super.onDestroyView()
     }
 
     private fun renderMarkdown(content: String) {
@@ -52,8 +52,11 @@ class ReadFragment : Fragment() {
         markdownRenderer.render(elements, binding.markdownContainer)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    companion object {
+        private const val ARG_CONTENT = "content"
+
+        fun newInstance(content: String) = ReadFragment().apply {
+            arguments = Bundle().apply { putString(ARG_CONTENT, content) }
+        }
     }
 }

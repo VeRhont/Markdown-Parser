@@ -13,7 +13,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Редактирование Markdown"
+            android:background="@color/orange"
+            app:title="Редактирование файла"
             app:navigationIcon="@drawable/baseline_arrow_back_24"
             app:menu="@menu/menu_edit"/>
 
@@ -21,22 +22,13 @@
             android:id="@+id/edit_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:autofillHints="Enter Markdown"
+            android:autofillHints="Введите markdown"
             android:gravity="start|top"
             android:inputType="textMultiLine|textCapSentences"
             android:padding="16dp"
             android:scrollbars="vertical"
             android:textSize="16sp"/>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:contentDescription="Готово"
-            android:src="Готово"
-            app:backgroundTint="@color/grey"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

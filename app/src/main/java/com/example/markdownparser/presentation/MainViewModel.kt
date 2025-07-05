@@ -13,8 +13,7 @@ class MarkdownViewModel : ViewModel() {
 
     private var markdown: Markdown = ""
 
-    fun loadMarkdownFile(content: Markdown) {
-        markdown = content
+    fun enterLoadMode() {
         _state.value = AppState.LoadMode
     }
 
@@ -22,12 +21,17 @@ class MarkdownViewModel : ViewModel() {
         _state.value = AppState.EditMode(markdown)
     }
 
-    fun saveContent(newContent: String) {
-        markdown = newContent
+    fun enterReadMode() {
         _state.value = AppState.ReadMode(markdown)
     }
 
-    fun resetToLoadMode() {
-        _state.value = AppState.LoadMode
+    fun loadMarkdownFile(content: Markdown) {
+        markdown = content
+        enterReadMode()
+    }
+
+    fun saveContent(content: Markdown) {
+        markdown = content
+        enterReadMode()
     }
 }
