@@ -15,11 +15,19 @@ sealed interface MarkdownElement {
 
     data class Table(
         val headers: List<String>,
-        val rows: List<List<String>>
-    ) : MarkdownElement
+        val rows: List<List<String>>,
+        val alignments: List<Alignment>,
+    ) : MarkdownElement {
+
+        enum class Alignment {
+            LEFT,
+            CENTER,
+            RIGHT
+        }
+    }
 
     data class Image(
         val altText: String,
-        val url: String
+        val url: String,
     ) : MarkdownElement
 }

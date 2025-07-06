@@ -20,15 +20,14 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.example.markdownparser.parser.MarkdownElement
+import com.example.markdownparser.parser.MarkdownElement.Table.Alignment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
 
-
 class MarkdownRenderer(private val context: Context) {
-
     private val imageCache = mutableMapOf<String, Bitmap>()
 
     fun render(elements: List<MarkdownElement>, container: LinearLayout) {
@@ -54,8 +53,6 @@ class MarkdownRenderer(private val context: Context) {
         container.addView(textView)
     }
 
-    private fun getHeadingSize(level: Int) = (26f - 2 * level).coerceAtLeast(14f)
-
     private fun renderText(paragraph: MarkdownElement.Text, container: LinearLayout) {
         val textView = TextView(context).apply {
             text = SpannableString(paragraph.text).apply {
@@ -76,6 +73,7 @@ class MarkdownRenderer(private val context: Context) {
     }
 
     private fun renderTable(table: MarkdownElement.Table, container: LinearLayout) {
+        val context = container.context
         val tableLayout = TableLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -86,28 +84,58 @@ class MarkdownRenderer(private val context: Context) {
         }
 
         val headerRow = TableRow(context)
-        for (header in table.headers) {
-            headerRow.addView(createTableCell(header, true))
+        for ((index, header) in table.headers.withIndex()) {
+            val alignment = table.alignments.getOrElse(index) { Alignment.LEFT }
+            headerRow.addView(createTableCell(header, true, alignment))
         }
         tableLayout.addView(headerRow)
 
+        val dividerRow = TableRow(context).apply {
+            layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        for (alignment in table.alignments) {
+            val divider = View(context).apply {
+                setBackgroundColor(Color.LTGRAY)
+                layoutParams = TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    dpToPx(1),
+                )
+            }
+            dividerRow.addView(divider)
+        }
+        tableLayout.addView(dividerRow)
+
         for (row in table.rows) {
             val tableRow = TableRow(context)
-            for (cell in row) {
-                tableRow.addView(createTableCell(cell, false))
+            for ((index, cell) in row.withIndex()) {
+                val alignment = table.alignments.getOrElse(index) { Alignment.LEFT }
+                tableRow.addView(createTableCell(cell, false, alignment))
             }
             tableLayout.addView(tableRow)
         }
         container.addView(tableLayout)
     }
 
-    private fun createTableCell(text: String, isHeader: Boolean): TextView {
+    private fun createTableCell(
+        text: String,
+        isHeader: Boolean,
+        alignment: Alignment,
+    ): TextView {
         return TextView(context).apply {
             this.text = text
             setTextSize(TypedValue.COMPLEX_UNIT_SP, if (isHeader) 14f else 12f)
             setTypeface(null, if (isHeader) Typeface.BOLD else Typeface.NORMAL)
-            gravity = Gravity.CENTER
-            setPadding(dpToPx(8))
+
+            gravity = when (alignment) {
+                Alignment.LEFT -> Gravity.START or Gravity.CENTER_VERTICAL
+                Alignment.CENTER -> Gravity.CENTER
+                Alignment.RIGHT -> Gravity.END or Gravity.CENTER_VERTICAL
+            }
+
+            setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8))
             layoutParams = TableRow.LayoutParams(
                 0,
                 TableRow.LayoutParams.WRAP_CONTENT,
@@ -194,6 +222,8 @@ class MarkdownRenderer(private val context: Context) {
             }
         }
     }
+
+    private fun getHeadingSize(level: Int) = (26f - 2 * level).coerceAtLeast(14f)
 
     private fun dpToPx(dp: Int) = (dp * context.resources.displayMetrics.density).toInt()
 }

@@ -7,12 +7,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.markdownparser.presentation.AppState
 import com.example.markdownparser.presentation.EditFragment
 import com.example.markdownparser.presentation.LoadFragment
 import com.example.markdownparser.presentation.MarkdownViewModel
 import com.example.markdownparser.presentation.ReadFragment
 import kotlinx.coroutines.launch
-
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MarkdownViewModel by viewModels()

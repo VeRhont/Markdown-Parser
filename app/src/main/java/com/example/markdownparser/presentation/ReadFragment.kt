@@ -14,11 +14,12 @@ class ReadFragment : Fragment() {
     private lateinit var binding: FragmentReadBinding
     private val viewModel: MarkdownViewModel by activityViewModels()
     private lateinit var markdownRenderer: MarkdownRenderer
+    private lateinit var markdownParser: MarkdownParser
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentReadBinding.inflate(inflater, container, false)
         return binding.root
@@ -28,6 +29,7 @@ class ReadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         markdownRenderer = MarkdownRenderer(requireContext())
+        markdownParser = MarkdownParser()
 
         arguments?.getString(ARG_CONTENT)?.let { content ->
             renderMarkdown(content)
@@ -48,7 +50,7 @@ class ReadFragment : Fragment() {
     }
 
     private fun renderMarkdown(content: String) {
-        val elements = MarkdownParser.parse(content)
+        val elements = markdownParser.parse(content)
         markdownRenderer.render(elements, binding.markdownContainer)
     }
 

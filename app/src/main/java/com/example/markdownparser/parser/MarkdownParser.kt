@@ -2,18 +2,20 @@ package com.example.markdownparser.parser
 
 typealias Markdown = String
 
-object MarkdownParser {
+class MarkdownParser {
     fun parse(markdown: Markdown): List<MarkdownElement> {
         val lines = markdown.lines()
         val elements = mutableListOf<MarkdownElement>()
         var currentTable: TableBuilder? = null
+        var inTable = false
 
         for (line in lines) {
-            if (currentTable != null) {
+            if (inTable) {
                 if (isTableRow(line)) {
-                    currentTable.addRow(line)
+                    currentTable?.addRow(line)
                 } else {
-                    elements.add(currentTable.build())
+                    inTable = false
+                    currentTable?.build()?.let { elements.add(it) }
                     currentTable = null
                     parseLine(line)?.let { elements.add(it) }
                 }
@@ -22,12 +24,13 @@ object MarkdownParser {
 
             if (isTableHeader(line)) {
                 currentTable = TableBuilder(line)
+                inTable = true
             } else {
                 parseLine(line)?.let { elements.add(it) }
             }
         }
-        currentTable?.build()?.let { elements.add(it) }
 
+        currentTable?.build()?.let { elements.add(it) }
         return elements
     }
 
@@ -91,11 +94,15 @@ object MarkdownParser {
     }
 
     private fun isTableHeader(line: String): Boolean {
-        return line.contains('|') && line.trim().startsWith('|')
+        val trimmed = line.trim()
+        return trimmed.startsWith('|') ||
+                (trimmed.contains('|') && !trimmed.startsWith('-'))
     }
 
     private fun isTableRow(line: String): Boolean {
-        return line.contains('|') && line.trim().startsWith('|')
+        val trimmed = line.trim()
+        return trimmed.startsWith('|') ||
+                trimmed.contains('|') && !trimmed.startsWith('-')
     }
 
     private fun isImage(line: String): Boolean {
