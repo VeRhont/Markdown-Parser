@@ -10,6 +10,7 @@
   - Таблицы с выравниванием
   - Изображения
 - 🚀 Интуитивно понятный интерфейс
+- 😍 Юнит тесты
 
 ## 🛠 Технологии
 <img src="https://img.shields.io/badge/Android-343434?style=for-the-badge&logo=Android&logoColor=green"/> <img src="https://img.shields.io/badge/Kotlin-343434?style=for-the-badge&logo=Kotlin&logoColor=orange"/>
