@@ -16,5 +16,6 @@
 
 ## Результат
 
-<img src="https://github.com/user-attachments/assets/d6365ef0-6ccb-4715-b451-1a9ff6cec7b8" alt="drawing" width="300"/>
-<img src="https://github.com/user-attachments/assets/29f21688-6a20-47ba-b127-fa6b6700b21f" alt="drawing" width="300"/>
+<img src="https://github.com/user-attachments/assets/1e34deea-33b7-40d0-b74a-47f4517b87a7" alt="Выбор файла" width="300"/>
+<img src="https://github.com/user-attachments/assets/d6365ef0-6ccb-4715-b451-1a9ff6cec7b8" alt="Отображение файла" width="300"/>
+<img src="https://github.com/user-attachments/assets/29f21688-6a20-47ba-b127-fa6b6700b21f" alt="Редактирование файла" width="300"/>
