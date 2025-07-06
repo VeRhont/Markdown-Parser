@@ -21,9 +21,13 @@ class MarkdownViewModel : ViewModel() {
     private val _state = MutableStateFlow<AppState>(AppState.LoadMode)
     val state: StateFlow<AppState> = _state
 
+    private val _fileState = MutableStateFlow<FileResult>(FileResult.Success)
+    val fileState: StateFlow<FileResult> = _fileState
+
     private var markdown: Markdown = ""
 
     fun enterLoadMode() {
+        _fileState.value = FileResult.Success
         _state.value = AppState.LoadMode
     }
 
@@ -35,7 +39,7 @@ class MarkdownViewModel : ViewModel() {
         _state.value = AppState.ReadMode(markdown)
     }
 
-    fun loadMarkdownFile(content: Markdown) {
+    private fun loadMarkdownFile(content: Markdown) {
         markdown = content
         enterReadMode()
     }
@@ -46,19 +50,27 @@ class MarkdownViewModel : ViewModel() {
     }
 
     fun loadFileFromUri(contentResolver: ContentResolver, uri: Uri) {
+        if (_fileState.value is FileResult.Loading) return
+        _fileState.value = FileResult.Loading
+
         viewModelScope.launch {
             try {
                 val content = withContext(Dispatchers.IO) {
                     readFileContent(contentResolver, uri)
                 }
+                _fileState.value = FileResult.Success
                 loadMarkdownFile(content)
             } catch (e: Exception) {
+                _fileState.value = FileResult.Error(e.message.orEmpty())
                 Log.e(TAG, e.message ?: "Unknown error")
             }
         }
     }
 
     fun loadFileFromUrl(url: String) {
+        if (_fileState.value is FileResult.Loading) return
+        _fileState.value = FileResult.Loading
+
         viewModelScope.launch {
             try {
                 val content = NetworkUtils.downloadMarkdownFile(url)
@@ -68,6 +80,7 @@ class MarkdownViewModel : ViewModel() {
                     is IOException -> "Network error: ${e.message}"
                     else -> "Failed to load file: ${e.message}"
                 }
+                _fileState.value = FileResult.Error(message)
                 Log.e(TAG, message)
             }
         }
@@ -91,4 +104,10 @@ class MarkdownViewModel : ViewModel() {
     private companion object {
         private const val TAG = "MainViewModel"
     }
+}
+
+sealed interface FileResult {
+    data object Loading : FileResult
+    data object Success : FileResult
+    data class Error(val errorMessage: String) : FileResult
 }

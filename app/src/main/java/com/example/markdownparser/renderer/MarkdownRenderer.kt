@@ -169,7 +169,7 @@ class MarkdownRenderer(private val context: Context) {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dpToPx(200)
             )
-            scaleType = ImageView.ScaleType.CENTER_CROP
+            scaleType = ImageView.ScaleType.CENTER
             visibility = View.GONE
         }
         imageContainer.addView(imageView)
@@ -183,7 +183,6 @@ class MarkdownRenderer(private val context: Context) {
             }
             imageContainer.addView(altTextView)
         }
-
         container.addView(imageContainer)
 
         loadImage(image.url, imageView, progressBar)

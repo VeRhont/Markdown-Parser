@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.markdownparser.databinding.FragmentLoadBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class LoadFragment : Fragment() {
     private lateinit var binding: FragmentLoadBinding
@@ -32,8 +36,22 @@ class LoadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.loadFile.setOnClickListener { openFilePicker() }
-        binding.fetchFile.setOnClickListener { downloadFromUrl() }
+        binding.loadFile.setOnClickListener {
+            openFilePicker()
+        }
+        binding.fetchFile.setOnClickListener {
+            if (viewModel.fileState.value !is FileResult.Loading) {
+                downloadFromUrl()
+            }
+        }
+
+        viewModel.fileState.onEach { result ->
+            when (result) {
+                is FileResult.Loading -> showLoading()
+                is FileResult.Success -> hideLoading()
+                is FileResult.Error -> showError(result.errorMessage)
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     override fun onDestroyView() {
@@ -53,35 +71,17 @@ class LoadFragment : Fragment() {
         }
     }
 
-    private fun testContentLoading() {
-        val testContent = """
-# Заголовок 1
-## Заголовок 2
-Обычный текст
-**Жирный текст**
-*Курсивный текст*
-~~Зачеркнутый текст~~
-~~**_Жирный текст_**~~
+    private fun showLoading() {
+        binding.progressBar.visibility = View.VISIBLE
+    }
 
-| Header 1 | Header 2 |
-|----------|----------|
-| Ячейка 1 | Ячейка 2 |
-| Ячейка 3 | Ячейка 4 |
+    private fun hideLoading() {
+        binding.progressBar.visibility = View.GONE
+    }
 
-![Описание картинки](https://i.pinimg.com/originals/b2/dc/9c/b2dc9c2cee44e45672ad6e3994563ac2.jpg)
-
-| Left | Center | Right |
-|:-----|:------:|------:|
-| A    | B      | C     |
-
-| Col1 | Col2 | Col3 |
-|------|------|------|
-|      | Data |      |
-| Data |      | Data |
-
-""".trimIndent()
-
-        viewModel.loadMarkdownFile(testContent)
+    private fun showError(message: String) {
+        hideLoading()
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {

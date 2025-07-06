@@ -82,11 +82,17 @@ class MarkdownParser {
     }
 
     private fun isBoldText(line: String): Boolean {
-        return line.contains("**") || line.contains("__")
+        val hasDoubleAsterisk = line.contains(Regex("""\*\*(.*?)\*\*"""))
+        val hasDoubleUnderscore = line.contains(Regex("""__(.*?)__"""))
+        return hasDoubleAsterisk || hasDoubleUnderscore
     }
 
     private fun isItalicText(line: String): Boolean {
-        return line.contains('*') || line.contains('_')
+        val hasSingleAsterisk = line.contains(Regex("""\*(.*?)\*""")) &&
+                !line.contains(Regex("""\*\*(.*?)\*\*"""))
+        val hasSingleUnderscore = line.contains(Regex("""_(.*?)_""")) &&
+                !line.contains(Regex("""__(.*?)__"""))
+        return hasSingleAsterisk || hasSingleUnderscore
     }
 
     private fun isStrikethroughText(line: String): Boolean {
